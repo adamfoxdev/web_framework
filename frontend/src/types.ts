@@ -464,3 +464,52 @@ export interface DeleteRecordsRequest {
 export interface DeleteRecordsResponse {
   deletedCount: number;
 }
+
+// --- Reports ---
+export interface Report {
+  id: string;
+  workspaceId?: string;
+  name: string;
+  description: string;
+  type: string;
+  status: string;
+  createdBy: string;
+  querySql: string;
+  schedule: string;
+  lastRunAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  tags: string[];
+}
+
+export interface CreateReportRequest {
+  name: string;
+  description: string;
+  type?: string;
+  querySql?: string;
+  schedule?: string;
+  tags?: string[];
+  workspaceId?: string;
+}
+
+export interface UpdateReportRequest {
+  name?: string;
+  description?: string;
+  type?: string;
+  status?: string;
+  querySql?: string;
+  schedule?: string;
+  tags?: string[];
+}
+
+export interface ReportSearchParams {
+  search?: string;
+  status?: string;
+  type?: string;
+  tag?: string;
+  workspaceId?: string;
+  sortBy?: string;
+  sortDesc?: boolean;
+  page?: number;
+  pageSize?: number;
+}

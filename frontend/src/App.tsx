@@ -10,6 +10,7 @@ import DataProjectsPage from './pages/DataProjectsPage';
 import WorkspacesPage from './pages/WorkspacesPage';
 import AdvancedSearchPage from './pages/AdvancedSearchPage';
 import RecordProcessingPage from './pages/RecordProcessingPage';
+import ReportsPage from './pages/ReportsPage';
 import { useAuth } from './context/AuthContext';
 
 export default function App() {
@@ -105,6 +106,17 @@ export default function App() {
           <ProtectedRoute>
             <Layout>
               <RecordProcessingPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ReportsPage />
             </Layout>
           </ProtectedRoute>
         }

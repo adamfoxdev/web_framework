@@ -409,6 +409,36 @@ public static class DbSeeder
             new QueryTag { QueryId = q5, Tag = "supply-chain" }
         );
 
+        // ===================== Reports =====================
+        var rpt1 = Guid.NewGuid();
+        var rpt2 = Guid.NewGuid();
+        var rpt3 = Guid.NewGuid();
+        var rpt4 = Guid.NewGuid();
+        var rpt5 = Guid.NewGuid();
+
+        db.Reports.AddRange(
+            new Report { Id = rpt1, WorkspaceId = ws1, Name = "Weekly Revenue Report", Description = "Summarises revenue across all product lines for the past week", Type = "Summary", Status = "Published", CreatedBy = "admin", QuerySql = "SELECT ProductLine, SUM(Revenue) AS TotalRevenue FROM sales GROUP BY ProductLine", Schedule = "Weekly", LastRunAt = Utc(-1), CreatedAt = Utc(-30), UpdatedAt = Utc(-1) },
+            new Report { Id = rpt2, WorkspaceId = ws2, Name = "Campaign Performance Dashboard", Description = "Real-time metrics for active marketing campaigns", Type = "Dashboard", Status = "Published", CreatedBy = "jsmith", QuerySql = "SELECT Campaign, Impressions, Clicks, Conversions FROM marketing_metrics WHERE IsActive = 1", Schedule = "Daily", LastRunAt = Utc(-0.5), CreatedAt = Utc(-45), UpdatedAt = Utc(-0.5) },
+            new Report { Id = rpt3, WorkspaceId = ws3, Name = "Financial Compliance Audit", Description = "Monthly compliance check across all financial datasets", Type = "Table", Status = "Published", CreatedBy = "admin", QuerySql = "SELECT DatasetName, ComplianceStatus, LastAudit FROM compliance_log", Schedule = "Monthly", LastRunAt = Utc(-5), CreatedAt = Utc(-60), UpdatedAt = Utc(-5) },
+            new Report { Id = rpt4, WorkspaceId = ws4, Name = "ML Model Accuracy Tracker", Description = "Tracks prediction accuracy over time for deployed models", Type = "Chart", Status = "Draft", CreatedBy = "jsmith", QuerySql = "SELECT ModelName, TrainDate, Accuracy FROM ml_models ORDER BY TrainDate", Schedule = "Manual", CreatedAt = Utc(-15), UpdatedAt = Utc(-15) },
+            new Report { Id = rpt5, WorkspaceId = ws5, Name = "Inventory Alert Summary", Description = "Current low-stock and overstock alerts for all warehouses", Type = "Table", Status = "Published", CreatedBy = "bwilson", QuerySql = "SELECT Warehouse, ProductSKU, CurrentStock, AlertType FROM inventory_alerts", Schedule = "Daily", LastRunAt = Utc(-0.2), CreatedAt = Utc(-20), UpdatedAt = Utc(-0.2) }
+        );
+
+        db.ReportTags.AddRange(
+            new ReportTag { ReportId = rpt1, Tag = "revenue" },
+            new ReportTag { ReportId = rpt1, Tag = "weekly" },
+            new ReportTag { ReportId = rpt1, Tag = "finance" },
+            new ReportTag { ReportId = rpt2, Tag = "marketing" },
+            new ReportTag { ReportId = rpt2, Tag = "campaign" },
+            new ReportTag { ReportId = rpt2, Tag = "dashboard" },
+            new ReportTag { ReportId = rpt3, Tag = "compliance" },
+            new ReportTag { ReportId = rpt3, Tag = "audit" },
+            new ReportTag { ReportId = rpt4, Tag = "ml" },
+            new ReportTag { ReportId = rpt4, Tag = "accuracy" },
+            new ReportTag { ReportId = rpt5, Tag = "inventory" },
+            new ReportTag { ReportId = rpt5, Tag = "alert" }
+        );
+
         db.SaveChanges();
     }
 

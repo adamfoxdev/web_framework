@@ -18,6 +18,8 @@ public class AppDbContext : DbContext
     public DbSet<Dataset> Datasets => Set<Dataset>();
     public DbSet<DataForm> DataForms => Set<DataForm>();
     public DbSet<DataQualityRule> DataQualityRules => Set<DataQualityRule>();
+    public DbSet<Report> Reports => Set<Report>();
+    public DbSet<ReportTag> ReportTags => Set<ReportTag>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -126,6 +128,26 @@ public class AppDbContext : DbContext
             e.HasOne(r => r.Project)
                 .WithMany(p => p.QualityRules)
                 .HasForeignKey(r => r.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---- Report ----
+        modelBuilder.Entity<Report>(e =>
+        {
+            e.Ignore(r => r.Tags);
+            e.HasOne(r => r.Workspace)
+                .WithMany()
+                .HasForeignKey(r => r.WorkspaceId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ---- ReportTag ----
+        modelBuilder.Entity<ReportTag>(e =>
+        {
+            e.HasKey(t => new { t.ReportId, t.Tag });
+            e.HasOne(t => t.Report)
+                .WithMany(r => r.ReportTags)
+                .HasForeignKey(t => t.ReportId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

@@ -468,3 +468,53 @@ public record DeleteRecordsRequest(
 public record DeleteRecordsResponse(
     int DeletedCount
 );
+
+// ==================== Reports ====================
+
+public record CreateReportRequest(
+    string Name,
+    string Description,
+    string? Type,           // Table, Chart, Summary, Dashboard
+    string? QuerySql,
+    string? Schedule,       // Manual, Daily, Weekly, Monthly
+    List<string>? Tags,
+    Guid? WorkspaceId
+);
+
+public record UpdateReportRequest(
+    string? Name,
+    string? Description,
+    string? Type,
+    string? Status,         // Draft, Published, Archived
+    string? QuerySql,
+    string? Schedule,
+    List<string>? Tags
+);
+
+public record ReportResponse(
+    Guid Id,
+    Guid? WorkspaceId,
+    string Name,
+    string Description,
+    string Type,
+    string Status,
+    string CreatedBy,
+    string QuerySql,
+    string Schedule,
+    DateTime? LastRunAt,
+    DateTime CreatedAt,
+    DateTime UpdatedAt,
+    List<string> Tags
+);
+
+public record ReportSearchParams(
+    string? Search = null,
+    string? Status = null,
+    string? Type = null,
+    string? Tag = null,
+    Guid? WorkspaceId = null,
+    string SortBy = "updatedat",
+    bool SortDesc = true,
+    int Page = 1,
+    int PageSize = 25
+);

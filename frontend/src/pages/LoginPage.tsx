@@ -66,8 +66,8 @@ export default function LoginPage() {
         <div className="demo-credentials">
           <p><strong>Demo accounts:</strong></p>
           <p>admin / Admin123! &nbsp;(Admin)</p>
-          <p>jdoe / User123! &nbsp;(User)</p>
-          <p>analyst1 / Analyst123! &nbsp;(Analyst)</p>
+          <p>jsmith / Analyst123! &nbsp;(Analyst)</p>
+          <p>mjones / Viewer123! &nbsp;(Viewer)</p>
         </div>
       </div>
     </div>
