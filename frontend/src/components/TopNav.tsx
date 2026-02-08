@@ -33,6 +33,7 @@ const megaMenus: Record<string, {
           { label: 'Alerts', to: '/alerts' },
           { label: 'Assets', to: '/assets' },
           { label: 'Calendar', to: '/calendar' },
+          { label: 'QueryLab', to: '/querylab' },
           { label: 'Record Processing', to: '/processing' },
           { label: 'Data Quality', to: '/projects' },
         ],

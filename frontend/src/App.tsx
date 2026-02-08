@@ -18,6 +18,7 @@ import JobsPage from './pages/JobsPage';
 import AlertsPage from './pages/AlertsPage';
 import AssetsPage from './pages/AssetsPage';
 import CalendarPage from './pages/CalendarPage';
+import QueryLabPage from './pages/QueryLabPage';
 import { useAuth } from './context/AuthContext';
 
 export default function App() {
@@ -201,6 +202,17 @@ export default function App() {
           <ProtectedRoute>
             <Layout>
               <CalendarPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/querylab"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <QueryLabPage />
             </Layout>
           </ProtectedRoute>
         }
