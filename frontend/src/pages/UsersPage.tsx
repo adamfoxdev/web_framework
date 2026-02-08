@@ -87,6 +87,7 @@ export default function UsersPage() {
         email: editingUser.email,
         firstName: editingUser.firstName,
         lastName: editingUser.lastName,
+        roles: editingUser.roles,
       });
       setEditingUser(null);
       await loadData();
@@ -176,6 +177,28 @@ export default function UsersPage() {
               <div className="form-group">
                 <label>Last Name</label>
                 <input value={editingUser.lastName} onChange={(e) => setEditingUser({ ...editingUser, lastName: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>Roles</label>
+                <div className="checkbox-group">
+                  {roles.map((r) => (
+                    <label key={r.name} className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={editingUser.roles.includes(r.name)}
+                        onChange={(e) => {
+                          setEditingUser({
+                            ...editingUser,
+                            roles: e.target.checked
+                              ? [...editingUser.roles, r.name]
+                              : editingUser.roles.filter((x) => x !== r.name),
+                          });
+                        }}
+                      />
+                      {r.name}
+                    </label>
+                  ))}
+                </div>
               </div>
               <div className="btn-group">
                 <button type="submit" className="btn btn-primary">Save</button>
