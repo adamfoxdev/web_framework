@@ -1,0 +1,6 @@
+@BigDataApp.Api_HostAddress = http://localhost:5239
+
+GET {{BigDataApp.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
