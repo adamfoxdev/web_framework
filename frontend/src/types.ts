@@ -44,3 +44,28 @@ export interface UpdateUserRequest {
   isActive?: boolean;
   roles?: string[];
 }
+
+// --- Pagination & Bulk ---
+
+export interface PagedResponse<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface UserQuery {
+  search?: string;
+  role?: string;
+  isActive?: boolean | null;
+  sortBy?: string;
+  sortDesc?: boolean;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface BulkOperationResult {
+  affected: number;
+  total: number;
+}

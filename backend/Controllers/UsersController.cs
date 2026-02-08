@@ -16,7 +16,7 @@ public class UsersController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public IActionResult GetAll() => Ok(_userService.GetAll());
+    public IActionResult GetAll([FromQuery] UserQuery query) => Ok(_userService.GetPaged(query));
 
     [HttpGet("{id:guid}")]
     public IActionResult GetById(Guid id)
@@ -77,5 +77,39 @@ public class UsersController : ControllerBase
 
         var user = _userService.GetByUsername(username);
         return user is null ? NotFound() : Ok(user);
+    }
+
+    // ---- Bulk Operations ----
+
+    [HttpPost("bulk/assign-roles")]
+    [Authorize(Roles = "Admin")]
+    public IActionResult BulkAssignRoles([FromBody] BulkRoleRequest request)
+    {
+        var result = _userService.BulkAssignRoles(request.UserIds, request.Roles);
+        return Ok(result);
+    }
+
+    [HttpPost("bulk/remove-roles")]
+    [Authorize(Roles = "Admin")]
+    public IActionResult BulkRemoveRoles([FromBody] BulkRoleRequest request)
+    {
+        var result = _userService.BulkRemoveRoles(request.UserIds, request.Roles);
+        return Ok(result);
+    }
+
+    [HttpPost("bulk/set-status")]
+    [Authorize(Roles = "Admin")]
+    public IActionResult BulkSetStatus([FromBody] BulkStatusRequest request)
+    {
+        var result = _userService.BulkSetStatus(request.UserIds, request.IsActive);
+        return Ok(result);
+    }
+
+    [HttpPost("bulk/delete")]
+    [Authorize(Roles = "Admin")]
+    public IActionResult BulkDelete([FromBody] BulkDeleteRequest request)
+    {
+        var result = _userService.BulkDelete(request.UserIds);
+        return Ok(result);
     }
 }

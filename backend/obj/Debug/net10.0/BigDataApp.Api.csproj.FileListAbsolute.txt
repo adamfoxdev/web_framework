@@ -39,3 +39,4 @@ C:\Code\web_framework\backend\obj\Debug\net10.0\refint\BigDataApp.Api.dll
 C:\Code\web_framework\backend\obj\Debug\net10.0\BigDataApp.Api.pdb
 C:\Code\web_framework\backend\obj\Debug\net10.0\BigDataApp.Api.genruntimeconfig.cache
 C:\Code\web_framework\backend\obj\Debug\net10.0\ref\BigDataApp.Api.dll
+C:\Code\web_framework\backend\obj\Debug\net10.0\BigDataApp.Api.sourcelink.json
