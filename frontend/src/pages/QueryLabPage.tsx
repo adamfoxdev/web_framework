@@ -271,7 +271,7 @@ export default function QueryLabPage() {
 
   return (
     <div style={{
-      display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden",
+      display: "flex", flexDirection: "column", flex: 1, overflow: "hidden",
       fontFamily: "'IBM Plex Mono', 'Fira Code', monospace", background: "#0d1117", color: "#c9d1d9", fontSize: 13,
     }}>
       <style>{`

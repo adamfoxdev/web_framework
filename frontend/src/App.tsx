@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
+import TopNav from './components/TopNav';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -211,9 +212,10 @@ export default function App() {
         path="/querylab"
         element={
           <ProtectedRoute>
-            <Layout>
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+              <TopNav />
               <QueryLabPage />
-            </Layout>
+            </div>
           </ProtectedRoute>
         }
       />
