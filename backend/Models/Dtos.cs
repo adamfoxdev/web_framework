@@ -438,3 +438,33 @@ public record ProcessingSessionSummary(
     int SkippedCount,
     List<ProcessRecordResponse> Submissions
 );
+
+// ==================== Record Browser / Import / Export ====================
+
+public record ImportRecordsRequest(
+    string Format,  // "csv" or "json"
+    string Data     // raw CSV or JSON text
+);
+
+public record ImportRecordsResponse(
+    Guid DatasetId,
+    int ImportedCount,
+    int SkippedCount,
+    List<string> Errors
+);
+
+public record ExportRecordsResponse(
+    Guid DatasetId,
+    string DatasetName,
+    string Format,
+    string Data,
+    int RecordCount
+);
+
+public record DeleteRecordsRequest(
+    List<int> RowIndices
+);
+
+public record DeleteRecordsResponse(
+    int DeletedCount
+);

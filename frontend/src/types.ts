@@ -434,3 +434,33 @@ export interface ProcessingSessionSummary {
   skippedCount: number;
   submissions: ProcessRecordResponse[];
 }
+
+// --- Record Browser / Import / Export ---
+
+export interface ImportRecordsRequest {
+  format: 'csv' | 'json';
+  data: string;
+}
+
+export interface ImportRecordsResponse {
+  datasetId: string;
+  importedCount: number;
+  skippedCount: number;
+  errors: string[];
+}
+
+export interface ExportRecordsResponse {
+  datasetId: string;
+  datasetName: string;
+  format: string;
+  data: string;
+  recordCount: number;
+}
+
+export interface DeleteRecordsRequest {
+  rowIndices: number[];
+}
+
+export interface DeleteRecordsResponse {
+  deletedCount: number;
+}

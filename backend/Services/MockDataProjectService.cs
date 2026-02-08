@@ -891,6 +891,216 @@ public class MockDataProjectService : IDataProjectService
         };
     }
 
+    // ===================== RECORD BROWSER / IMPORT / EXPORT =====================
+
+    // In-memory store for imported records (keyed by datasetId)
+    private readonly Dictionary<Guid, List<Dictionary<string, string>>> _importedRecords = new();
+
+    public ImportRecordsResponse? ImportRecords(Guid projectId, Guid datasetId, ImportRecordsRequest request)
+    {
+        var p = _projects.FirstOrDefault(x => x.Id == projectId);
+        var ds = p?.Datasets.FirstOrDefault(d => d.Id == datasetId);
+        if (ds is null) return null;
+
+        var errors = new List<string>();
+        var imported = new List<Dictionary<string, string>>();
+
+        try
+        {
+            if (request.Format.Equals("csv", StringComparison.OrdinalIgnoreCase))
+            {
+                var lines = request.Data.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                if (lines.Length < 2)
+                {
+                    errors.Add("CSV must have at least a header row and one data row");
+                    return new ImportRecordsResponse(datasetId, 0, 0, errors);
+                }
+
+                var headers = lines[0].Split(',').Select(h => h.Trim().Trim('"')).ToArray();
+
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    var values = SplitCsvLine(lines[i]);
+                    if (values.Length != headers.Length)
+                    {
+                        errors.Add($"Row {i}: expected {headers.Length} columns, got {values.Length}");
+                        continue;
+                    }
+                    var row = new Dictionary<string, string>();
+                    for (int j = 0; j < headers.Length; j++)
+                        row[headers[j]] = values[j].Trim().Trim('"');
+                    imported.Add(row);
+                }
+            }
+            else if (request.Format.Equals("json", StringComparison.OrdinalIgnoreCase))
+            {
+                var rows = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, string>>>(request.Data);
+                if (rows is null || rows.Count == 0)
+                {
+                    errors.Add("JSON must be an array of objects");
+                    return new ImportRecordsResponse(datasetId, 0, 0, errors);
+                }
+                imported.AddRange(rows);
+            }
+            else
+            {
+                errors.Add($"Unsupported format: {request.Format}. Use 'csv' or 'json'.");
+                return new ImportRecordsResponse(datasetId, 0, 0, errors);
+            }
+        }
+        catch (Exception ex)
+        {
+            errors.Add($"Parse error: {ex.Message}");
+            return new ImportRecordsResponse(datasetId, 0, imported.Count, errors);
+        }
+
+        // Store imported records
+        if (!_importedRecords.ContainsKey(datasetId))
+            _importedRecords[datasetId] = new List<Dictionary<string, string>>();
+        _importedRecords[datasetId].AddRange(imported);
+
+        // Update dataset record count and size
+        ds.RecordCount += imported.Count;
+        ds.SizeBytes += imported.Sum(r => r.Sum(kv => kv.Key.Length + kv.Value.Length)) * 2;
+
+        // Auto-detect columns from first imported row if dataset has no columns
+        if (ds.Columns.Count == 0 && imported.Count > 0)
+        {
+            ds.Columns = imported[0].Keys.Select(k => new DataColumn
+            {
+                Name = k,
+                DataType = "string",
+                Nullable = true,
+                Description = $"Imported column: {k}"
+            }).ToList();
+        }
+
+        return new ImportRecordsResponse(datasetId, imported.Count, errors.Count, errors);
+    }
+
+    public ExportRecordsResponse? ExportRecords(Guid projectId, Guid datasetId, string format = "csv")
+    {
+        var p = _projects.FirstOrDefault(x => x.Id == projectId);
+        var ds = p?.Datasets.FirstOrDefault(d => d.Id == datasetId);
+        if (ds is null) return null;
+
+        // Gather all records (mock + imported), cap at 500 for export
+        var allRecords = new List<Dictionary<string, string>>();
+
+        // Get mock records (all pages)
+        var mockTotal = (int)Math.Min(ds.RecordCount, 200);
+        if (ds.Columns.Count > 0)
+        {
+            var rng = new Random(ds.Id.GetHashCode());
+            for (int i = 0; i < mockTotal; i++)
+            {
+                var values = new Dictionary<string, string>();
+                foreach (var col in ds.Columns)
+                    values[col.Name] = GenerateMockValue(col, i, rng);
+                allRecords.Add(values);
+            }
+        }
+
+        // Add imported records
+        if (_importedRecords.ContainsKey(datasetId))
+            allRecords.AddRange(_importedRecords[datasetId]);
+
+        // Cap at 500
+        if (allRecords.Count > 500)
+            allRecords = allRecords.Take(500).ToList();
+
+        // Determine column names from dataset, or from record keys
+        var columnNames = ds.Columns.Count > 0
+            ? ds.Columns.Select(c => c.Name).ToList()
+            : allRecords.Count > 0
+                ? allRecords[0].Keys.ToList()
+                : new List<string>();
+
+        string data;
+        if (format.Equals("json", StringComparison.OrdinalIgnoreCase))
+        {
+            data = System.Text.Json.JsonSerializer.Serialize(allRecords, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        }
+        else
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine(string.Join(",", columnNames.Select(EscapeCsv)));
+            foreach (var row in allRecords)
+            {
+                var vals = columnNames.Select(c => row.TryGetValue(c, out var v) ? EscapeCsv(v) : "");
+                sb.AppendLine(string.Join(",", vals));
+            }
+            data = sb.ToString();
+        }
+
+        return new ExportRecordsResponse(datasetId, ds.Name, format, data, allRecords.Count);
+    }
+
+    public DeleteRecordsResponse? DeleteRecords(Guid projectId, Guid datasetId, DeleteRecordsRequest request)
+    {
+        var p = _projects.FirstOrDefault(x => x.Id == projectId);
+        var ds = p?.Datasets.FirstOrDefault(d => d.Id == datasetId);
+        if (ds is null) return null;
+
+        // For mock data we just decrement the count; for imported records, actually remove them
+        var deletedCount = 0;
+        if (_importedRecords.ContainsKey(datasetId))
+        {
+            var mockTotal = (int)Math.Min(ds.RecordCount - _importedRecords[datasetId].Count, 200);
+            var importedIndices = request.RowIndices.Where(i => i >= mockTotal).Select(i => i - mockTotal).OrderByDescending(i => i).ToList();
+            foreach (var idx in importedIndices)
+            {
+                if (idx >= 0 && idx < _importedRecords[datasetId].Count)
+                {
+                    _importedRecords[datasetId].RemoveAt(idx);
+                    deletedCount++;
+                }
+            }
+            deletedCount += request.RowIndices.Count(i => i < mockTotal);
+        }
+        else
+        {
+            deletedCount = request.RowIndices.Count;
+        }
+
+        ds.RecordCount = Math.Max(0, ds.RecordCount - deletedCount);
+        return new DeleteRecordsResponse(deletedCount);
+    }
+
+    private static string EscapeCsv(string val)
+    {
+        if (val.Contains(',') || val.Contains('"') || val.Contains('\n'))
+            return $"\"{val.Replace("\"", "\"\"")}\"";
+        return val;
+    }
+
+    private static string[] SplitCsvLine(string line)
+    {
+        var result = new List<string>();
+        var current = new System.Text.StringBuilder();
+        bool inQuotes = false;
+        for (int i = 0; i < line.Length; i++)
+        {
+            if (inQuotes)
+            {
+                if (line[i] == '"')
+                {
+                    if (i + 1 < line.Length && line[i + 1] == '"') { current.Append('"'); i++; }
+                    else inQuotes = false;
+                }
+                else current.Append(line[i]);
+            }
+            else
+            {
+                if (line[i] == '"') inQuotes = true;
+                else if (line[i] == ',') { result.Add(current.ToString()); current.Clear(); }
+                else current.Append(line[i]);
+            }
+        }
+        result.Add(current.ToString());
+        return result.ToArray();
+    }
+
     // ===================== LOOKUPS =====================
 
     public List<string> GetProjectStatuses() => new() { "Draft", "Active", "Archived" };

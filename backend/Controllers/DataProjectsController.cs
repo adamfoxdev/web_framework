@@ -78,6 +78,36 @@ public class DataProjectsController : ControllerBase
     public IActionResult DeleteDataset(Guid projectId, Guid datasetId) =>
         _svc.DeleteDataset(projectId, datasetId) ? NoContent() : NotFound();
 
+    // ==================== Dataset Records (Browse / Import / Export) ====================
+
+    [HttpGet("{projectId:guid}/datasets/{datasetId:guid}/records")]
+    public IActionResult BrowseRecords(Guid projectId, Guid datasetId, [FromQuery] int page = 1, [FromQuery] int pageSize = 50)
+    {
+        var result = _svc.GetDatasetRecords(projectId, datasetId, page, pageSize);
+        return result is null ? NotFound() : Ok(result);
+    }
+
+    [HttpPost("{projectId:guid}/datasets/{datasetId:guid}/records/import")]
+    public IActionResult ImportRecords(Guid projectId, Guid datasetId, [FromBody] ImportRecordsRequest request)
+    {
+        var result = _svc.ImportRecords(projectId, datasetId, request);
+        return result is null ? NotFound() : Ok(result);
+    }
+
+    [HttpGet("{projectId:guid}/datasets/{datasetId:guid}/records/export")]
+    public IActionResult ExportRecords(Guid projectId, Guid datasetId, [FromQuery] string format = "csv")
+    {
+        var result = _svc.ExportRecords(projectId, datasetId, format);
+        return result is null ? NotFound() : Ok(result);
+    }
+
+    [HttpPost("{projectId:guid}/datasets/{datasetId:guid}/records/delete")]
+    public IActionResult DeleteRecords(Guid projectId, Guid datasetId, [FromBody] DeleteRecordsRequest request)
+    {
+        var result = _svc.DeleteRecords(projectId, datasetId, request);
+        return result is null ? NotFound() : Ok(result);
+    }
+
     // ==================== Forms ====================
 
     [HttpGet("{projectId:guid}/forms/{formId:guid}")]

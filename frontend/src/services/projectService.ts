@@ -17,6 +17,11 @@ import type {
   ProcessRecordRequest,
   ProcessRecordResponse,
   ProcessingSessionSummary,
+  ImportRecordsRequest,
+  ImportRecordsResponse,
+  ExportRecordsResponse,
+  DeleteRecordsRequest,
+  DeleteRecordsResponse,
 } from '../types';
 
 function toQS(params: ProjectSearchParams): string {
@@ -84,4 +89,14 @@ export const projectService = {
     api.post<ProcessRecordResponse>(`/projects/${projectId}/processing/submit`, data),
   getProcessingSummary: (projectId: string, datasetId: string, formId: string) =>
     api.get<ProcessingSessionSummary>(`/projects/${projectId}/processing/summary?datasetId=${datasetId}&formId=${formId}`),
+
+  // Record Browser / Import / Export
+  browseRecords: (projectId: string, datasetId: string, page = 1, pageSize = 50) =>
+    api.get<DatasetRecordsResponse>(`/projects/${projectId}/datasets/${datasetId}/records?page=${page}&pageSize=${pageSize}`),
+  importRecords: (projectId: string, datasetId: string, data: ImportRecordsRequest) =>
+    api.post<ImportRecordsResponse>(`/projects/${projectId}/datasets/${datasetId}/records/import`, data),
+  exportRecords: (projectId: string, datasetId: string, format: 'csv' | 'json' = 'csv') =>
+    api.get<ExportRecordsResponse>(`/projects/${projectId}/datasets/${datasetId}/records/export?format=${format}`),
+  deleteRecords: (projectId: string, datasetId: string, data: DeleteRecordsRequest) =>
+    api.post<DeleteRecordsResponse>(`/projects/${projectId}/datasets/${datasetId}/records/delete`, data),
 };

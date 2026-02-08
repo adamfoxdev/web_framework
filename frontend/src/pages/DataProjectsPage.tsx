@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { projectService } from '../services/projectService';
 import { useWorkspace } from '../context/WorkspaceContext';
+import DatasetRecordBrowser from '../components/DatasetRecordBrowser';
 import type {
   DataProject,
   DataProjectDetail,
@@ -61,6 +62,9 @@ export default function DataProjectsPage() {
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
   const [editRule, setEditRule] = useState({ name: '', description: '', ruleType: 'completeness', column: '', expression: '', severity: 'error', isActive: true });
   const [complianceFwInput, setComplianceFwInput] = useState('');
+
+  // record browser
+  const [browsingDataset, setBrowsingDataset] = useState<{ id: string; name: string } | null>(null);
 
   // ---------- fetch ----------
   const fetchProjects = useCallback(async () => {
@@ -577,6 +581,7 @@ export default function DataProjectsPage() {
                   <span title="Records">{formatNumber(ds.recordCount)} rows</span>
                   <span title="Size">{formatBytes(ds.sizeBytes)}</span>
                   <span title="Columns">{ds.columns.length} cols</span>
+                  <button className="btn btn-outline btn-xs" onClick={e => { e.stopPropagation(); setBrowsingDataset({ id: ds.id, name: ds.name }); }} title="Browse Records">📊</button>
                   <button className="btn btn-outline btn-xs" onClick={e => { e.stopPropagation(); startEditDataset(ds); }} title="Edit">✎</button>
                   <button className="btn btn-danger btn-xs" onClick={e => { e.stopPropagation(); handleDeleteDataset(ds.id); }}>×</button>
                 </div>
@@ -1347,6 +1352,16 @@ export default function DataProjectsPage() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Record Browser Modal */}
+      {browsingDataset && detail && (
+        <DatasetRecordBrowser
+          projectId={detail.id}
+          datasetId={browsingDataset.id}
+          datasetName={browsingDataset.name}
+          onClose={() => { setBrowsingDataset(null); refreshDetail(); }}
+        />
       )}
     </div>
   );

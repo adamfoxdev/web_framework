@@ -35,6 +35,11 @@ public interface IDataProjectService
     ProcessRecordResponse? ProcessRecord(Guid projectId, ProcessRecordRequest request, string processedBy);
     ProcessingSessionSummary? GetProcessingSummary(Guid projectId, Guid datasetId, Guid formId);
 
+    // Record Browser / Import / Export
+    ImportRecordsResponse? ImportRecords(Guid projectId, Guid datasetId, ImportRecordsRequest request);
+    ExportRecordsResponse? ExportRecords(Guid projectId, Guid datasetId, string format = "csv");
+    DeleteRecordsResponse? DeleteRecords(Guid projectId, Guid datasetId, DeleteRecordsRequest request);
+
     // Lookups
     List<string> GetProjectStatuses();
     List<string> GetDatasetFormats();
