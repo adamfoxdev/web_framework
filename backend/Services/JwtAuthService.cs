@@ -1,38 +1,45 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using BigDataApp.Api.Data;
 using BigDataApp.Api.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BigDataApp.Api.Services;
 
 public class JwtAuthService : IAuthService
 {
-    private readonly MockUserService _userService;
+    private readonly AppDbContext _db;
     private readonly IConfiguration _config;
 
-    public JwtAuthService(IUserService userService, IConfiguration config)
+    public JwtAuthService(AppDbContext db, IConfiguration config)
     {
-        _userService = (MockUserService)userService;
+        _db = db;
         _config = config;
     }
 
     public LoginResponse? Login(LoginRequest request)
     {
-        var user = _userService.GetUserEntityByUsername(request.Username);
+        var user = _db.Users
+            .Include(u => u.UserRoles)
+            .FirstOrDefault(u => u.Username == request.Username);
+
         if (user is null || !user.IsActive)
             return null;
 
-        if (!MockUserService.VerifyPassword(request.Password, user.PasswordHash))
+        if (!VerifyPassword(request.Password, user.PasswordHash))
             return null;
 
         var expiration = DateTime.UtcNow.AddHours(8);
-        var token = GenerateToken(user, expiration);
+        var roles = user.UserRoles.Select(ur => ur.RoleName).ToArray();
+        var token = GenerateToken(user, roles, expiration);
 
-        return new LoginResponse(token, user.Username, user.Roles.ToArray(), expiration);
+        return new LoginResponse(token, user.Username, roles, expiration);
     }
 
-    private string GenerateToken(User user, DateTime expiration)
+    private string GenerateToken(User user, string[] roles, DateTime expiration)
     {
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
@@ -47,7 +54,7 @@ public class JwtAuthService : IAuthService
             new("lastName", user.LastName)
         };
 
-        foreach (var role in user.Roles)
+        foreach (var role in roles)
             claims.Add(new Claim(ClaimTypes.Role, role));
 
         var token = new JwtSecurityToken(
@@ -58,5 +65,23 @@ public class JwtAuthService : IAuthService
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    // ---- Password hashing (PBKDF2) — same format as DbSeeder ----
+    internal static bool VerifyPassword(string password, string storedHash)
+    {
+        var parts = storedHash.Split(':');
+        if (parts.Length != 2) return false;
+        byte[] salt = Convert.FromBase64String(parts[0]);
+        byte[] expected = Convert.FromBase64String(parts[1]);
+        byte[] actual = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100_000, HashAlgorithmName.SHA256, 32);
+        return CryptographicOperations.FixedTimeEquals(actual, expected);
+    }
+
+    internal static string HashPassword(string password)
+    {
+        byte[] salt = RandomNumberGenerator.GetBytes(16);
+        byte[] hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100_000, HashAlgorithmName.SHA256, 32);
+        return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
     }
 }

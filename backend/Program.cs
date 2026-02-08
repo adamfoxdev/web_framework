@@ -1,6 +1,8 @@
 using System.Text;
+using BigDataApp.Api.Data;
 using BigDataApp.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,16 +12,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-// Mock services (swap for real implementations later)
-builder.Services.AddSingleton<IUserService, MockUserService>();
-builder.Services.AddSingleton<IRoleService, MockRoleService>();
-builder.Services.AddSingleton<IAuthService, JwtAuthService>();
-builder.Services.AddSingleton<MockQueryService>();
-builder.Services.AddSingleton<IQueryService>(sp => sp.GetRequiredService<MockQueryService>());
-builder.Services.AddSingleton<MockDataProjectService>();
-builder.Services.AddSingleton<IDataProjectService>(sp => sp.GetRequiredService<MockDataProjectService>());
-builder.Services.AddSingleton<MockWorkspaceService>();
-builder.Services.AddSingleton<IWorkspaceService>(sp => sp.GetRequiredService<MockWorkspaceService>());
+// EF Core — SQL Server LocalDB
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Application services (EF-backed)
+builder.Services.AddScoped<IUserService, EfUserService>();
+builder.Services.AddScoped<IRoleService, EfRoleService>();
+builder.Services.AddScoped<IAuthService, JwtAuthService>();
+builder.Services.AddScoped<IQueryService, EfQueryService>();
+builder.Services.AddScoped<IDataProjectService, EfDataProjectService>();
+builder.Services.AddScoped<IWorkspaceService, EfWorkspaceService>();
 
 // JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -54,18 +57,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ---------- Cross-service wiring for workspace-aware seed data ----------
+// ---------- Database initialisation ----------
+using (var scope = app.Services.CreateScope())
 {
-    var wsSvc = app.Services.GetRequiredService<MockWorkspaceService>();
-    var projSvc = app.Services.GetRequiredService<MockDataProjectService>();
-    var querySvc = app.Services.GetRequiredService<MockQueryService>();
-
-    var wsIds = wsSvc.GetWorkspaceIds();
-    projSvc.SeedWithWorkspaces(wsIds);
-    querySvc.SeedWithWorkspaces(wsIds);
-
-    wsSvc.SetProjectService(projSvc);
-    wsSvc.SetQueryService(querySvc);
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+    DbSeeder.Seed(db);
 }
 
 // ---------- Middleware ----------

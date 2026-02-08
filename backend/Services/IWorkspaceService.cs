@@ -11,10 +11,4 @@ public interface IWorkspaceService
     bool Delete(Guid id);
     List<WorkspaceResponse> GetWorkspacesForUser(string username);
     List<string> GetDepartments();
-
-    // Cross-service helpers
-    int GetProjectCount(Guid workspaceId);
-    int GetQueryCount(Guid workspaceId);
-    void SetProjectService(IDataProjectService projectService);
-    void SetQueryService(IQueryService queryService);
 }
