@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import Editor from "@monaco-editor/react";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import { Search, Play, ChevronDown, ChevronRight, Copy, Download, Clock, CheckCircle, AlertTriangle, XCircle, Database, Table2, Terminal, FileText, Maximize2, Minimize2, X, Plus, Save, Share2, Code2, Eye, Braces, ArrowUpDown, PanelLeftClose, PanelLeftOpen, PanelBottomClose, PanelBottomOpen, PanelRightClose, PanelRightOpen, RotateCcw, Star, Bookmark, Columns3, Hash, Type, Calendar, ToggleLeft, Grip, Loader2, Check, Info, Bug, Activity } from "lucide-react";
 
@@ -533,23 +534,28 @@ export default function QueryLabPage() {
 
               {/* SQL editor area */}
               <div style={{ flex: 1, overflow: "hidden", display: "flex", background: "#0d1117", position: "relative" }}>
-                <textarea
+                <Editor
+                  height="100%"
+                  defaultLanguage="sql"
                   value={activeTab.sql}
-                  onChange={(e) => updateTabSQL(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: "10px 8px",
-                    background: "#0d1117",
-                    color: "#c9d1d9",
-                    border: "none",
-                    outline: "none",
+                  onChange={(value) => updateTabSQL(value || "")}
+                  theme="vs-dark"
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: 13.5,
+                    lineHeight: 28,
                     fontFamily: "'IBM Plex Mono', 'Fira Code', monospace",
-                    fontSize: "13.5px",
-                    lineHeight: "1.75",
-                    resize: "none",
-                    overflow: "auto",
+                    fontLigatures: true,
+                    wordWrap: "on",
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    tabSize: 2,
+                    insertSpaces: true,
+                    formatOnPaste: true,
+                    copyWithSyntaxHighlighting: true,
+                    quickSuggestions: { other: true, comments: false, strings: false },
+                    suggestOnTriggerCharacters: true,
                   }}
-                  spellCheck="false"
                 />
               </div>
             </div>

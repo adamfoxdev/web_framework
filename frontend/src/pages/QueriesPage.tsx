@@ -2,6 +2,7 @@ import {
   useEffect, useState, useCallback, useRef,
   type FormEvent, type ChangeEvent, type KeyboardEvent,
 } from 'react';
+import Editor from '@monaco-editor/react';
 import { queryService } from '../services/queryService';
 import { useWorkspace } from '../context/WorkspaceContext';
 import type {
@@ -90,7 +91,6 @@ export default function QueriesPage() {
 
   // -- Refs --
   const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const editorRef = useRef<HTMLTextAreaElement>(null);
 
   // ====================== Data Loading ======================
 
@@ -233,24 +233,6 @@ export default function QueriesPage() {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       addTag();
-    }
-  };
-
-  // ====================== Tab / indent support ======================
-
-  const handleEditorKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const ta = editorRef.current;
-      if (!ta) return;
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      const val = form.sqlText;
-      const updated = val.substring(0, start) + '  ' + val.substring(end);
-      setForm({ ...form, sqlText: updated });
-      requestAnimationFrame(() => {
-        ta.selectionStart = ta.selectionEnd = start + 2;
-      });
     }
   };
 
@@ -531,23 +513,33 @@ export default function QueriesPage() {
                   </button>
                 </div>
               </div>
-              <div className="qr-editor-wrap">
-                <textarea
-                  ref={editorRef}
-                  className="qr-sql-textarea"
+              <div className="qr-editor-wrap" style={{ height: '400px', border: '1px solid #ddd', borderRadius: '6px', overflow: 'hidden' }}>
+                <Editor
+                  height="100%"
+                  defaultLanguage="sql"
                   value={form.sqlText}
-                  onChange={(e) => { setForm({ ...form, sqlText: e.target.value }); setValidation(null); }}
-                  onKeyDown={handleEditorKeyDown}
-                  placeholder="SELECT ..."
-                  spellCheck={false}
-                  required
+                  onChange={(value) => {
+                    setForm({ ...form, sqlText: value || '' });
+                    setValidation(null);
+                  }}
+                  theme="vs-light"
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: 13,
+                    lineHeight: 24,
+                    fontFamily: "'IBM Plex Mono', 'Fira Code', monospace",
+                    fontLigatures: true,
+                    wordWrap: 'on',
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    tabSize: 2,
+                    insertSpaces: true,
+                    formatOnPaste: true,
+                    copyWithSyntaxHighlighting: true,
+                    quickSuggestions: { other: true, comments: false, strings: false },
+                    suggestOnTriggerCharacters: true,
+                  }}
                 />
-                {/* Overlay for line numbers */}
-                <div className="qr-line-numbers">
-                  {(form.sqlText || ' ').split('\n').map((_, i) => (
-                    <div key={i} className="qr-line-num">{i + 1}</div>
-                  ))}
-                </div>
               </div>
             </div>
 
