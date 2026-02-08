@@ -177,6 +177,23 @@ export default function DashboardPage() {
           <p className="stat-value">3</p>
           <p className="stat-label">Saved Queries</p>
         </div>
+        <div 
+          className="card stat-card"
+          onClick={() => navigate('/lineage')}
+          style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.boxShadow = '';
+            e.currentTarget.style.transform = '';
+          }}
+        >
+          <h3>Pipeline Lineage</h3>
+          <p className="stat-value">18</p>
+          <p className="stat-label">Data Assets</p>
+        </div>
       </div>
     </div>
   );

@@ -34,6 +34,7 @@ const megaMenus: Record<string, {
           { label: 'Assets', to: '/assets' },
           { label: 'Calendar', to: '/calendar' },
           { label: 'QueryLab', to: '/querylab' },
+          { label: 'Lineage', to: '/lineage' },
           { label: 'Record Processing', to: '/processing' },
           { label: 'Data Quality', to: '/projects' },
         ],

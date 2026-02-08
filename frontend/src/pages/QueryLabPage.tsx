@@ -201,6 +201,14 @@ export default function QueryLabPage() {
   const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0];
   const resultSet = activeTab.resultKey ? (queryResultSets as any)[activeTab.resultKey] : null;
 
+  const updateTabSQL = (newSQL: string) => {
+    setTabs(prevTabs =>
+      prevTabs.map(t =>
+        t.id === activeTabId ? { ...t, sql: newSQL, saved: false } : t
+      )
+    );
+  };
+
   const runQuery = () => {
     setIsRunning(true);
     setBottomPanel("results");
@@ -247,24 +255,6 @@ export default function QueryLabPage() {
   const ROWS_PER_PAGE = 8;
   const pagedRows = sortedRows.slice(resultPage * ROWS_PER_PAGE, (resultPage + 1) * ROWS_PER_PAGE);
   const totalPages = resultSet ? Math.ceil(sortedRows.length / ROWS_PER_PAGE) : 0;
-
-  // SQL syntax highlighting (simple)
-  const highlightSQL = (sql: string) => {
-    const keywords = ["SELECT","FROM","JOIN","LEFT","RIGHT","INNER","OUTER","CROSS","WHERE","GROUP","ORDER","BY","LIMIT","AS","ON","AND","OR","NOT","IN","EXISTS","BETWEEN","LIKE","IS","NULL","COUNT","SUM","AVG","MIN","MAX","FORMAT","CURRENT_DATE","CURRENT_TIMESTAMP","DATE_TRUNC","DESC","ASC","DISTINCT","CASE","WHEN","THEN","ELSE","END","HAVING","UNION","ALL","INSERT","UPDATE","DELETE","CREATE","ALTER","DROP","WITH","OVER","PARTITION","DESCRIBE","TABLE"];
-    return sql.split("\n").map((line, li) => (
-      <div key={li} style={{ display: "flex", minHeight: 22 }}>
-        <span style={{ width: 44, textAlign: "right", paddingRight: 16, color: "#484f58", userSelect: "none", fontSize: 12, flexShrink: 0 }}>{li + 1}</span>
-        <span style={{ whiteSpace: "pre" }}>
-          {line.split(/(\b\w+\b|'[^']*'|--.*$)/g).map((token: string, ti: number) => {
-            if (keywords.includes(token.toUpperCase())) return <span key={ti} style={{ color: "#ff7b72", fontWeight: 500 }}>{token}</span>;
-            if (token.startsWith("'")) return <span key={ti} style={{ color: "#a5d6ff" }}>{token}</span>;
-            if (token.startsWith("--")) return <span key={ti} style={{ color: "#484f58", fontStyle: "italic" }}>{token}</span>;
-            return <span key={ti}>{token}</span>;
-          })}
-        </span>
-      </div>
-    ));
-  };
 
   const levelColors: Record<string, string> = { INFO: "#58a6ff", DEBUG: "#484f58", WARN: "#d29922", ERROR: "#f85149" };
   const levelIcons: Record<string, React.ElementType> = { INFO: Info, DEBUG: Bug, WARN: AlertTriangle, ERROR: XCircle };
@@ -542,10 +532,25 @@ export default function QueryLabPage() {
               </div>
 
               {/* SQL editor area */}
-              <div style={{ flex: 1, overflow: "auto", padding: "10px 0", background: "#0d1117" }}>
-                <pre style={{ margin: 0, padding: "0 8px", lineHeight: 1.75, fontSize: 13.5, whiteSpace: "pre", color: "#c9d1d9" }}>
-                  {highlightSQL(activeTab.sql)}
-                </pre>
+              <div style={{ flex: 1, overflow: "hidden", display: "flex", background: "#0d1117", position: "relative" }}>
+                <textarea
+                  value={activeTab.sql}
+                  onChange={(e) => updateTabSQL(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: "10px 8px",
+                    background: "#0d1117",
+                    color: "#c9d1d9",
+                    border: "none",
+                    outline: "none",
+                    fontFamily: "'IBM Plex Mono', 'Fira Code', monospace",
+                    fontSize: "13.5px",
+                    lineHeight: "1.75",
+                    resize: "none",
+                    overflow: "auto",
+                  }}
+                  spellCheck="false"
+                />
               </div>
             </div>
           )}

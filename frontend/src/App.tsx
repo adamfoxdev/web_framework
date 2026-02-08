@@ -20,6 +20,7 @@ import AlertsPage from './pages/AlertsPage';
 import AssetsPage from './pages/AssetsPage';
 import CalendarPage from './pages/CalendarPage';
 import QueryLabPage from './pages/QueryLabPage';
+import LineagePage from './pages/LineagePage';
 import { useAuth } from './context/AuthContext';
 
 export default function App() {
@@ -215,6 +216,18 @@ export default function App() {
             <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
               <TopNav />
               <QueryLabPage />
+            </div>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/lineage"
+        element={
+          <ProtectedRoute>
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+              <TopNav />
+              <LineagePage />
             </div>
           </ProtectedRoute>
         }
