@@ -3,7 +3,7 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
-import UsersPage from './pages/UsersPage';
+import UsersDesignSwitcher from './pages/UsersDesignSwitcher';
 import RolesPage from './pages/RolesPage';
 import { useAuth } from './context/AuthContext';
 
@@ -33,7 +33,7 @@ export default function App() {
         element={
           <ProtectedRoute requiredRole="Admin">
             <Layout>
-              <UsersPage />
+              <UsersDesignSwitcher />
             </Layout>
           </ProtectedRoute>
         }
