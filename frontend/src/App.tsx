@@ -11,6 +11,7 @@ import WorkspacesPage from './pages/WorkspacesPage';
 import AdvancedSearchPage from './pages/AdvancedSearchPage';
 import RecordProcessingPage from './pages/RecordProcessingPage';
 import ReportsPage from './pages/ReportsPage';
+import ERDDesignerPage from './pages/ERDDesignerPage';
 import { useAuth } from './context/AuthContext';
 
 export default function App() {
@@ -117,6 +118,17 @@ export default function App() {
           <ProtectedRoute>
             <Layout>
               <ReportsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/erd"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ERDDesignerPage />
             </Layout>
           </ProtectedRoute>
         }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Code\\web_framework\\backend\\BigDataApp.Api.csproj": {}
+    "C:\\Code\\web_framework\\backend\\BigDataApp.Api.csproj": {}
   },
   "projects": {
-    "c:\\Code\\web_framework\\backend\\BigDataApp.Api.csproj": {
+    "C:\\Code\\web_framework\\backend\\BigDataApp.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Code\\web_framework\\backend\\BigDataApp.Api.csproj",
+        "projectUniqueName": "C:\\Code\\web_framework\\backend\\BigDataApp.Api.csproj",
         "projectName": "BigDataApp.Api",
-        "projectPath": "c:\\Code\\web_framework\\backend\\BigDataApp.Api.csproj",
+        "projectPath": "C:\\Code\\web_framework\\backend\\BigDataApp.Api.csproj",
         "packagesPath": "C:\\Users\\adamf\\.nuget\\packages\\",
-        "outputPath": "c:\\Code\\web_framework\\backend\\obj\\",
+        "outputPath": "C:\\Code\\web_framework\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

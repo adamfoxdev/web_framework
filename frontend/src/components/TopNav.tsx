@@ -2,8 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Search, ChevronDown, Bell, Settings, HelpCircle, Home, Zap,
-  Database, FileText, Shield, Activity, Layers, GitBranch,
-  ArrowRight, Clock, Users, BarChart3, Briefcase, TrendingUp
+  Database, ArrowRight, Clock, Layers
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useWorkspace } from '../context/WorkspaceContext';
@@ -22,6 +21,7 @@ const megaMenus: Record<string, {
           { label: 'Saved Queries', to: '/queries' },
           { label: 'Advanced Search', to: '/search' },
           { label: 'Reports', to: '/reports' },
+          { label: 'ERD Designer', to: '/erd' },
         ],
       },
       {
