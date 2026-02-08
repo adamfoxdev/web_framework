@@ -513,3 +513,136 @@ export interface ReportSearchParams {
   page?: number;
   pageSize?: number;
 }
+// --- Validation Types ---
+
+export enum ValidationOperator {
+  Equals = 'Equals',
+  NotEquals = 'NotEquals',
+  GreaterThan = 'GreaterThan',
+  LessThan = 'LessThan',
+  GreaterThanOrEqual = 'GreaterThanOrEqual',
+  LessThanOrEqual = 'LessThanOrEqual',
+  Contains = 'Contains',
+  NotContains = 'NotContains',
+  StartsWith = 'StartsWith',
+  EndsWith = 'EndsWith',
+  Matches = 'Matches',
+  Between = 'Between',
+  In = 'In',
+  NotIn = 'NotIn',
+  IsNull = 'IsNull',
+  IsNotNull = 'IsNotNull',
+  IsEmail = 'IsEmail',
+  IsUrl = 'IsUrl',
+  IsPhoneNumber = 'IsPhoneNumber',
+  Length = 'Length',
+  MinLength = 'MinLength',
+  MaxLength = 'MaxLength',
+  NumericRange = 'NumericRange',
+  DateRange = 'DateRange'
+}
+
+export enum DataType {
+  String = 'String',
+  Integer = 'Integer',
+  Decimal = 'Decimal',
+  Boolean = 'Boolean',
+  DateTime = 'DateTime',
+  Email = 'Email',
+  PhoneNumber = 'PhoneNumber',
+  Url = 'Url'
+}
+
+export interface ValidationRule {
+  id: string;
+  name: string;
+  description: string;
+  priority: number;
+  fieldName: string;
+  fieldType: DataType;
+  operator: ValidationOperator;
+  operatorValue?: string;
+  errorMessage?: string;
+  isActive: boolean;
+  canAutoCorrect: boolean;
+  autoCorrectAction?: string;
+  createdAt: string;
+}
+
+export interface ValidationFieldResult {
+  fieldName: string;
+  value?: any;
+  isValid: boolean;
+  errorMessage?: string;
+  suggestion?: string;
+  failedRule?: ValidationOperator;
+}
+
+export interface ValidationRowResult {
+  rowNumber: number;
+  rowId: string;
+  isValid: boolean;
+  fieldResults: ValidationFieldResult[];
+  crossFieldErrors: string[];
+  hasDuplicate: boolean;
+  duplicateRowNumber?: number;
+}
+
+export interface FieldProfile {
+  fieldName: string;
+  fieldType: DataType;
+  completeness: number;
+  uniqueness: number;
+  nullCount: number;
+  uniqueValues: number;
+  minValue?: any;
+  maxValue?: any;
+  average?: number;
+  stdDeviation?: number;
+  topValues?: Record<string, number>;
+}
+
+export interface DataProfile {
+  id: string;
+  dataSourceName: string;
+  profiledAt: string;
+  totalRows: number;
+  totalFields: number;
+  fieldProfiles: FieldProfile[];
+  potentialIssues: string[];
+}
+
+export interface ValidationReport {
+  id: string;
+  dataSourceName: string;
+  executedAt: string;
+  summary: {
+    totalRows: number;
+    validRows: number;
+    invalidRows: number;
+    validityPercentage: number;
+    duplicateCount: number;
+  };
+  results: ValidationRowResult[];
+  errorSummary: Record<string, number>;
+  profile?: DataProfile;
+}
+
+export interface AutoCorrectionSuggestion {
+  rowNumber: number;
+  fieldName: string;
+  currentValue?: any;
+  suggestedValue?: any;
+  reason: string;
+  confidence: number;
+}
+
+export interface ValidateDataRequest {
+  dataSourceName: string;
+  rows: Record<string, any>[];
+  validationRuleIds?: string[];
+  detectDuplicates?: boolean;
+  duplicateCheckFields?: string[];
+  generateProfile?: boolean;
+  includeAutoCorrections?: boolean;
+}

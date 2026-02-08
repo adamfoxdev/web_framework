@@ -47,6 +47,9 @@ builder.Services.AddScoped<IDataProjectService, EfDataProjectService>();
 builder.Services.AddScoped<IWorkspaceService, EfWorkspaceService>();
 builder.Services.AddScoped<IReportService, EfReportService>();
 
+// Validation and data profiling services
+builder.Services.AddScoped<IValidationEngine, ValidationEngine>();
+
 // JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

@@ -12,6 +12,12 @@ import AdvancedSearchPage from './pages/AdvancedSearchPage';
 import RecordProcessingPage from './pages/RecordProcessingPage';
 import ReportsPage from './pages/ReportsPage';
 import ERDDesignerPage from './pages/ERDDesignerPage';
+import DataValidationPage from './pages/DataValidationPage';
+import DataPipelinesPage from './pages/DataPipelinesPage';
+import JobsPage from './pages/JobsPage';
+import AlertsPage from './pages/AlertsPage';
+import AssetsPage from './pages/AssetsPage';
+import CalendarPage from './pages/CalendarPage';
 import { useAuth } from './context/AuthContext';
 
 export default function App() {
@@ -129,6 +135,72 @@ export default function App() {
           <ProtectedRoute>
             <Layout>
               <ERDDesignerPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/data-validation"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <DataValidationPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/data-pipelines"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <DataPipelinesPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/jobs"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <JobsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/alerts"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <AlertsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/assets"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <AssetsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/calendar"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <CalendarPage />
             </Layout>
           </ProtectedRoute>
         }

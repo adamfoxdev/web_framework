@@ -17,16 +17,22 @@ const megaMenus: Record<string, {
       {
         title: 'Data & Analytics',
         items: [
+          { label: 'Data Pipelines', to: '/data-pipelines' },
           { label: 'Data Projects', to: '/projects' },
           { label: 'Saved Queries', to: '/queries' },
           { label: 'Advanced Search', to: '/search' },
           { label: 'Reports', to: '/reports' },
           { label: 'ERD Designer', to: '/erd' },
+          { label: 'Data Validation', to: '/data-validation' },
         ],
       },
       {
         title: 'Process & Monitor',
         items: [
+          { label: 'Jobs', to: '/jobs' },
+          { label: 'Alerts', to: '/alerts' },
+          { label: 'Assets', to: '/assets' },
+          { label: 'Calendar', to: '/calendar' },
           { label: 'Record Processing', to: '/processing' },
           { label: 'Data Quality', to: '/projects' },
         ],
