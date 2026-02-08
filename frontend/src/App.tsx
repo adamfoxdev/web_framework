@@ -5,6 +5,11 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import UsersDesignSwitcher from './pages/UsersDesignSwitcher';
 import RolesPage from './pages/RolesPage';
+import QueriesPage from './pages/QueriesPage';
+import DataProjectsPage from './pages/DataProjectsPage';
+import WorkspacesPage from './pages/WorkspacesPage';
+import AdvancedSearchPage from './pages/AdvancedSearchPage';
+import RecordProcessingPage from './pages/RecordProcessingPage';
 import { useAuth } from './context/AuthContext';
 
 export default function App() {
@@ -45,6 +50,61 @@ export default function App() {
           <ProtectedRoute requiredRole="Admin">
             <Layout>
               <RolesPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/queries"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <QueriesPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/projects"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <DataProjectsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/workspaces"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <WorkspacesPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <AdvancedSearchPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/processing"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <RecordProcessingPage />
             </Layout>
           </ProtectedRoute>
         }

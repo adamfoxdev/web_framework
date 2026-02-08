@@ -14,6 +14,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IUserService, MockUserService>();
 builder.Services.AddSingleton<IRoleService, MockRoleService>();
 builder.Services.AddSingleton<IAuthService, JwtAuthService>();
+builder.Services.AddSingleton<MockQueryService>();
+builder.Services.AddSingleton<IQueryService>(sp => sp.GetRequiredService<MockQueryService>());
+builder.Services.AddSingleton<MockDataProjectService>();
+builder.Services.AddSingleton<IDataProjectService>(sp => sp.GetRequiredService<MockDataProjectService>());
+builder.Services.AddSingleton<MockWorkspaceService>();
+builder.Services.AddSingleton<IWorkspaceService>(sp => sp.GetRequiredService<MockWorkspaceService>());
 
 // JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -47,6 +53,20 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// ---------- Cross-service wiring for workspace-aware seed data ----------
+{
+    var wsSvc = app.Services.GetRequiredService<MockWorkspaceService>();
+    var projSvc = app.Services.GetRequiredService<MockDataProjectService>();
+    var querySvc = app.Services.GetRequiredService<MockQueryService>();
+
+    var wsIds = wsSvc.GetWorkspaceIds();
+    projSvc.SeedWithWorkspaces(wsIds);
+    querySvc.SeedWithWorkspaces(wsIds);
+
+    wsSvc.SetProjectService(projSvc);
+    wsSvc.SetQueryService(querySvc);
+}
 
 // ---------- Middleware ----------
 

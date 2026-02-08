@@ -1,7 +1,9 @@
 import { useAuth } from '../context/AuthContext';
+import { useWorkspace } from '../context/WorkspaceContext';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { activeWorkspace, workspaces } = useWorkspace();
 
   return (
     <div>
@@ -18,6 +20,40 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Active Workspace Banner */}
+      {activeWorkspace && (
+        <div className="ws-banner" style={{ borderLeftColor: activeWorkspace.color }}>
+          <span className="ws-banner-icon">{activeWorkspace.icon}</span>
+          <div className="ws-banner-info">
+            <h3>{activeWorkspace.name}</h3>
+            <p>{activeWorkspace.description}</p>
+          </div>
+          <div className="ws-banner-stats">
+            <div className="ws-banner-stat">
+              <span className="ws-banner-num">{activeWorkspace.projectCount}</span>
+              <span>Projects</span>
+            </div>
+            <div className="ws-banner-stat">
+              <span className="ws-banner-num">{activeWorkspace.queryCount}</span>
+              <span>Queries</span>
+            </div>
+            <div className="ws-banner-stat">
+              <span className="ws-banner-num">{activeWorkspace.members.length}</span>
+              <span>Members</span>
+            </div>
+          </div>
+        </div>
+      )}
+      {!activeWorkspace && (
+        <div className="ws-banner ws-banner-all">
+          <span className="ws-banner-icon">🌐</span>
+          <div className="ws-banner-info">
+            <h3>All Workspaces</h3>
+            <p>Viewing data across all {workspaces.length} workspaces</p>
+          </div>
+        </div>
+      )}
 
       <div className="stats-grid">
         <div className="card stat-card">
